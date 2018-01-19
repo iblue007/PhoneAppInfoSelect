@@ -1,0 +1,71 @@
+import java.text.SimpleDateFormat
+
+apply plugin: 'com.android.application'
+
+android {
+    signingConfigs {
+        debug {
+            keyAlias 'flkeystore'
+            keyPassword 'flkeystore'
+            storeFile file('E:/dev/flkeystore')
+            storePassword 'flkeystore'
+        }
+        release {
+            keyAlias 'flkeystore'
+            keyPassword 'flkeystore'
+            storeFile file('E:/dev/flkeystore')
+            storePassword 'flkeystore'
+        }
+    }
+    compileSdkVersion 25
+    buildToolsVersion "25.0.3"
+    defaultConfig {
+        applicationId "com.xqx.phoneappinfoselect"
+        minSdkVersion 14
+        targetSdkVersion 25
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    applicationVariants.all { variant ->
+
+        def fn = variant.flavorName;
+        fn = (fn == null || fn.length() < 1) ? "" : "_" + fn;
+        def replaceName = "phoneAppInfoSelect" + fn + "_V" + versionName + ".apk"
+        if (variant.buildType.name.equals("release")) {
+            replaceName = "phoneAppInfoSelect" + fn + "_V" + versionName + "_" + releaseTime() + ".apk";
+        }
+
+        variant.outputs.each { output ->
+            output.outputFile = new File(
+                    output.outputFile.parent,
+                    output.outputFile.name.replace(output.outputFile.name, replaceName))
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+    }
+}
+
+def releaseTime() {
+    Date current = new Date();
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
+    return sdf.format(current);
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile 'com.android.support:appcompat-v7:25.3.1'
+    testCompile 'junit:junit:4.12'
+    compile files('libs/ndanalytics_sdk_20151209_v4.jar')
+    compile 'com.squareup.okhttp3:okhttp:3.2.0'
+}
